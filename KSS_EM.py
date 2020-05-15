@@ -94,19 +94,20 @@ def single_em(C,B,qin_init=1, qout_init=1, alpha_init=0.05, tol=1e-3, max_num_it
 def em(C,B):
     alpha_init_list = np.arange(0,0.2,0.05)[1:]
     qin_init_list = np.arange(0.5,5,0.5)
-    qout_init_list = [1]
+    qout_init_list = np.arange(0.5,2,0.5)
     
     loglik_max = -np.Inf
     
     for alpha_init in alpha_init_list:
         for qin_init in qin_init_list:
             for qout_init in qout_init_list:
-                qin_list, qout_list, alpha_list, resps, loglik_cur = single_em(C,B,qin_init=qin_init,qout_init=qout_init,alpha_init=alpha_init, max_num_iter=1000,min_num_iter=50)
-                if loglik_cur > loglik_max:
-                    qin_list_max = qin_list
-                    qout_list_max = qout_list
-                    alpha_list_max = alpha_list
-                    resps_max = resps
+                if qin_init > qout_init:
+                    qin_list, qout_list, alpha_list, resps, loglik_cur = single_em(C,B,qin_init=qin_init,qout_init=qout_init,alpha_init=alpha_init, max_num_iter=1000,min_num_iter=50)
+                    if loglik_cur > loglik_max:
+                        qin_list_max = qin_list
+                        qout_list_max = qout_list
+                        alpha_list_max = alpha_list
+                        resps_max = resps
 
                     loglik_max = loglik_cur
     qin = qin_list_max[np.nonzero(qin_list_max)][-1]
