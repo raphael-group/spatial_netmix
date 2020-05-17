@@ -16,7 +16,7 @@ def shift_resps(resps, alpha_est):
     return resps - threshold
 
 # converts column col of some tsv list (no headers) to numpy float array
-def tsv_to_np(filename, col=0):
+def tsv_to_np(filename, col):
     
     res = []
     
@@ -29,7 +29,7 @@ def tsv_to_np(filename, col=0):
             
     return np.array(res)
 
-def tsv_to_array(filename, col=0):
+def tsv_to_array(filename, col):
     res = []
     with open(filename, 'r') as fp:
         reader = csv.reader(fp, delimiter='\t')
@@ -46,18 +46,18 @@ def tsv_to_array(filename, col=0):
 
 # TODO: Fill in paths
 expected_path = '' 
-observed_path = ''
-names_path = ''
-resp_path = "path/to/folder/scores_resp.tsv"
+observed_path = '' 
+names_path = '' 
+resp_path = ''
 
-C = tsv_to_np(expected_path) 
-B = tsv_to_np(observed_path) 
-node_names = tsv_to_array(names_path)
+C = tsv_to_np(observed_path, col=1) 
+B = tsv_to_np(expected_path, col=1) 
+node_names = tsv_to_array(names_path, col=0)
 
 qin_est,qout_est,alpha_est,resps_est = em(C,B)
 resps_shift = shift_resps(resps_est, alpha_est)
 
 with open(resp_path, "w+") as f:
     tsv_writer = csv.writer(f, delimiter='\t')
-    for i,c in enumerate(county_fips):
+    for i in range(len(node_names)):
         tsv_writer.writerow([str(node_names[i]), str(resps_shift[i])])
