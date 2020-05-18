@@ -1,5 +1,4 @@
 .DS_Store
-*tsv
 test.ipynb
 .ipynb_checkpoints
 *__pycache__
