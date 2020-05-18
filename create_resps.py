@@ -45,16 +45,19 @@ def tsv_to_array(filename, col):
 ####################################################################
 
 # TODO: Fill in paths
-expected_path = '' 
-observed_path = '' 
-names_path = '' 
-resp_path = ''
+expected_path = './expected.tsv' 
+observed_path = './observed.tsv' 
+names_path = './expected.tsv' 
+resp_path = './scores_resp.tsv'
 
 C = tsv_to_np(observed_path, col=1) 
 B = tsv_to_np(expected_path, col=1) 
 node_names = tsv_to_array(names_path, col=0)
 
 qin_est,qout_est,alpha_est,resps_est = em(C,B)
+print("qin_est: {}".format(qin_est))
+print("qout_est: {}".format(qout_est))
+print("alpha_est {}".format(alpha_est))
 resps_shift = shift_resps(resps_est, alpha_est)
 
 with open(resp_path, "w+") as f:

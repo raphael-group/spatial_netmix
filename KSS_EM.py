@@ -92,9 +92,9 @@ def single_em(C,B,qin_init=1, qout_init=1, alpha_init=0.05, tol=1e-3, max_num_it
     return (qin_list, qout_list, alpha_list, resps_cur, loglik_cur)
 
 def em(C,B):
-    alpha_init_list = np.arange(0,0.2,0.05)[1:]
-    qin_init_list = np.arange(0.5,5,0.5)
-    qout_init_list = np.arange(0.5,2,0.5)
+    alpha_init_list = np.arange(0,0.1,0.05)[1:]
+    qin_init_list = np.arange(0.5,10,0.1)
+    qout_init_list = np.arange(0.5,5,0.1)
     
     loglik_max = -np.Inf
     
