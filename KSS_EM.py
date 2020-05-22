@@ -45,7 +45,7 @@ def compute_responsibilities(C,B,qin,qout,alpha):
     num = alpha*poisson.pmf(C,qin*B)
     denom = num + (1-alpha)*poisson.pmf(C,qout*B)
     
-    return num/denom
+    return num/denom, num, denom
 
 def compute_log_lik(C,B,qin,qout,alpha):
     x = alpha*poisson.pmf(C,qin*B)
@@ -53,7 +53,7 @@ def compute_log_lik(C,B,qin,qout,alpha):
     return np.nansum(np.log(x+y))
 
 def single_em(C,B,qin_init=1, qout_init=1, alpha_init=0.05, tol=1e-3, max_num_iter=1000, min_num_iter = 100):
-    resps_init = compute_responsibilities(C,B,qin_init,qout_init, alpha_init)
+    resps_init, num_init, denom_init = compute_responsibilities(C,B,qin_init,qout_init, alpha_init)
     
     loglik_prev = -np.inf
     
@@ -81,7 +81,7 @@ def single_em(C,B,qin_init=1, qout_init=1, alpha_init=0.05, tol=1e-3, max_num_it
         alpha_list[_+1] = alpha_cur
         
         # M step: update resps
-        resps_cur = compute_responsibilities(C,B,qin_cur,qout_cur, alpha_cur)
+        resps_cur, num_cur, denom_cur = compute_responsibilities(C,B,qin_cur,qout_cur, alpha_cur)
         
         # check for convergence
         loglik_cur = compute_log_lik(C,B,qin_cur,qout_cur, alpha_cur)
@@ -89,7 +89,7 @@ def single_em(C,B,qin_init=1, qout_init=1, alpha_init=0.05, tol=1e-3, max_num_it
             break
         else:
             loglik_prev = loglik_cur
-    return (qin_list, qout_list, alpha_list, resps_cur, loglik_cur)
+    return (qin_list, qout_list, alpha_list, resps_cur, num_cur, denom_cur, loglik_cur)
 
 def em(C,B):
     alpha_init_list = np.arange(0,0.1,0.05)[1:]
@@ -102,12 +102,14 @@ def em(C,B):
         for qin_init in qin_init_list:
             for qout_init in qout_init_list:
                 if qin_init > qout_init:
-                    qin_list, qout_list, alpha_list, resps, loglik_cur = single_em(C,B,qin_init=qin_init,qout_init=qout_init,alpha_init=alpha_init, max_num_iter=1000,min_num_iter=50)
+                    qin_list, qout_list, alpha_list, resps, nums, denoms, loglik_cur = single_em(C,B,qin_init=qin_init,qout_init=qout_init,alpha_init=alpha_init, max_num_iter=1000,min_num_iter=50)
                     if loglik_cur > loglik_max:
                         qin_list_max = qin_list
                         qout_list_max = qout_list
                         alpha_list_max = alpha_list
                         resps_max = resps
+                        nums_max = nums
+                        denoms_max = denoms
 
                     loglik_max = loglik_cur
     qin = qin_list_max[np.nonzero(qin_list_max)][-1]
@@ -122,5 +124,5 @@ def em(C,B):
         qout = qout_new
         alpha = 1-alpha
         resps = 1-resps
-    return qin,qout,alpha,resps_max
+    return qin,qout,alpha,resps_max,nums_max,denoms_max
 
